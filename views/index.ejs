@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DERMALAY</title>
+    <meta name="description" content="Use the power of Machine Learning to diagnose Skin Lesions.">
+
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/stylesheets/bootstrap-grid.min.css">
+
+</head>
+<body>
+  <div> 
+    <div>
+      <img id = "selected-image" src="/images/samplepic.jpg" alt="image for analysis" height="250">
+    </div>
+
+    <div id="btn">
+      <button onclick="setTimeout(simulateClick.bind(null, 'image-selector'), 200)"></button>
+    </div>
+
+    <p>Results</p>
+    <ol id="prediction-list"></ol>
+
+    <!-- Simulate the button -->
+    <div class="hide">
+      <button id='predict-button'></button>
+    </div>
+
+    <div class='hide'>
+      <!-- Multiple attribute allows the user to upload multiple files -->
+      <input type="file" id="image-selector" value="upload" multiple>
+      <progress value="0" max="100" id="uploader">0%</progress>
+    </div>
+
+    <div> 
+      <!-- Loading Firebase -->
+      <!-- The core Firebase JS SDK is always required and must be listed first -->
+      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
+
+      <!-- TODO: Add SDKs for Firebase products that you want to use
+          https://firebase.google.com/docs/web/setup#available-libraries -->
+
+      <!-- To solve "firebase.storage is not a function" error -->
+      <!-- Add Firebase products that you want to use -->
+      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-storage.js"></script>
+
+      <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+          apiKey: "AIzaSyCHMO_aIWt42duMldhaZSweakDreBb7HPY",
+          authDomain: "spott-ai-dermatologist-f2375.firebaseapp.com",
+          databaseURL: "https://spott-ai-dermatologist-f2375.firebaseio.com",
+          projectId: "spott-ai-dermatologist-f2375",
+          storageBucket: "spott-ai-dermatologist-f2375.appspot.com",
+          messagingSenderId: "998566774276",
+          appId: "1:998566774276:web:7681fc77ef8a2aa921d751"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get Elements from DOM //
+        // Creating a variable for each of the DOM elements
+        var uploader = document.getElementById('uploader');
+        var fileButton = document.getElementById('image-selector');
+
+        // Listen for file to be selected
+        // we will listen to change event
+        fileButton.addEventListener('change', function(e){
+            // Get the file
+            var file = e.target.files[0];
+
+            // Create a storage ref
+            var storageRef = firebase.storage().ref('skin_images_classified/' + file.name);
+
+            // Upload a file
+            var task = storageRef.put(file);
+
+            // Update progress bar
+            task.on("state_changed", 
+            
+                function progress(snapshot) {
+                  var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                  uploader.value = percentage;
+                },
+                function error(err) {
+                  alert("Error in uploading the image");
+                },
+                function complete() {            
+                }
+            );
+        });
+      </script> 
+
+      <!-- Loading Tensorflowjs -->
+      <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+
+      <!-- Loading jQuery -->
+           <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+
+      <!-- Loading files -->
+      <script src="/javascripts/target_classes.js"></script>
+      <script src="/javascripts/app_startup_code.js"></script>
+      <script src="/javascripts/app_batch_prediction_code.js"></script>
+    </div>
+
+  </div> <!-- End of main container -->
+
+
+</body>
+</html>
